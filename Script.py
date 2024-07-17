@@ -26,6 +26,7 @@ import subprocess
 import time
 from tkinter import messagebox
 import subprocess
+from tkinter import filedialog
 
 def RemoveSpaceFromName(Name):
     Name = Name.replace(" ", "")
@@ -40,6 +41,18 @@ NameOfPrevSeries = "Breaking Bad"
 prevSeries = RemoveSpaceFromName(NameOfPrevSeries)
 prevSeason =5
 prevEpisode =4
+
+responsE = ""
+
+entry1 = ""
+entry2 = ""
+entry3 = ""
+entry4 = ""
+
+
+script_path = os.path.abspath(__file__)
+script_dir = os.path.split(script_path)[0]
+
 
 NameOfSeries = "Breaking Bad"
 Series = RemoveSpaceFromName(NameOfSeries)
@@ -72,12 +85,19 @@ SUbToDownload = []
 
 DownloadURL = []
 
-FilePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\Movies\Subtitles\MajdSub_{Series}_S{Season}E{Episode}.srt'
-SeriesFolder = rf'C:\Users\majdl\OneDrive\Desktop\Majd\Movies'
+FilePath = rf'{script_dir}\Subtitles\MajdSub_{Series}_S{Season}E{Episode}.srt'
+SeriesFolder = rf''
 SubPath = ""
 
 current_index = 1
 
+folder_selected = ""
+
+OSUsername = ""
+OSPassword = ""
+APiKey = "TD36XSkIVGJwXZfAlayTeEl4usDj5dqi"
+
+Vlcpath = "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"
 
 ## VAriable Class
 class Id:
@@ -85,30 +105,49 @@ class Id:
 
 ## Functions
 def login():
+    global OSUsername
+    global OSPassword
+    global APiKey
+    global responsE
     url = "https://api.opensubtitles.com/api/v1/login"
 
     payload ={
-        "username": "Majdl",
-        "password": "Moj2008."
+        "username": OSUsername,
+        "password": OSPassword
     }
 
     headers = {
         "Content-Type": "application/json",
         "User-Agent": "<<MajdSub v0.1>>",
         "Accept": "application/json",
-        "Api-Key": "boSWYGhOSq3uTdOAvGaDEolYoS1AZYVe"
+        "Api-Key": APiKey
     }
 
     response = requests.post(url, json=payload, headers=headers)
+    response = json.loads(response.text)
+    responsE = response['status']
+
+
 
 def SearchForSub():
+    global Series
+    global Season
+    global Episode
+    global typeOfContent
+    global slug_file_id_list
+    global SUbToDownload
+    global APiKey
+    global Id
+    global fileID
+    global responsE
+
     url = "https://api.opensubtitles.com/api/v1/subtitles"
 
     querystring = {"type": typeOfContent,"query": Series,"languages":"ar","season_number": Season,"episode_number": Episode}
 
     headers = {
         "User-Agent": "<<MajdSub v0.1>>",
-        "Api-Key": "boSWYGhOSq3uTdOAvGaDEolYoS1AZYVe"
+        "Api-Key": APiKey
     }
 
     response1 = requests.get(url, headers=headers, params=querystring)
@@ -135,6 +174,9 @@ def SearchForSub():
     
 
 def DownloadSub():
+    global Id
+    global Delay
+    global APiKey
     global FilePath
     url = "https://api.opensubtitles.com/api/v1/download"
 
@@ -144,7 +186,7 @@ def DownloadSub():
         "User-Agent": "<<MajdSub V1.0>>",
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Api-Key": "boSWYGhOSq3uTdOAvGaDEolYoS1AZYVe"
+        "Api-Key": APiKey
     }
 
     response2 = requests.post(url, json=payload, headers=headers)
@@ -157,6 +199,7 @@ def DownloadSub():
         print('Downloaded')
 
 def OpenFile(Series, Season, Episode):
+    global Vlcpath
     global SubPath
     print(f'{Series} S{Season} E{Episode}')
     matching_files = []
@@ -171,6 +214,7 @@ def OpenFile(Series, Season, Episode):
                 matching_files.append(os.path.join(root, file_name))
             
     matchingFile = str(random.choice(matching_files))
+    matchingFile = matchingFile.replace('/', '\\')
     print(matchingFile)
     for root, dirs, files in os.walk(matchingFile):
         for file in dirs:
@@ -208,10 +252,11 @@ def OpenFile(Series, Season, Episode):
             elif f'e{Episode}' in file:
                 episodepathlist.append(os.path.join(root, file))
     episodePath = str(random.choice(episodepathlist))
+    episodePath = episodePath.replace('/', '\\')
+    
     print(episodePath)
-    vlc_path = r'C:\Program Files\VideoLAN\VLC\vlc.exe'
     vlc_command = [
-    vlc_path,
+    Vlcpath,
     '--extraintf', 'http',
     '--play-and-exit',  
     '--fullscreen',     
@@ -247,7 +292,7 @@ def play():
     prevSeries = Series
     EpisodeSubNAme = Episode
     SeasonSubName = Season
-    FilePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\Movies\Subtitles\MajdSub_{Series}_S{SeasonSubName}E{EpisodeSubNAme}.srt'
+    FilePath = rf'{script_dir}\Subtitles\MajdSub_{Series}_S{SeasonSubName}E{EpisodeSubNAme}.srt'
     ShowID = get_show_id(THeSHowNAme)
     if ShowID is None:
         print('No show found')
@@ -297,13 +342,6 @@ def EncodeSRT(encoding='utf-8'):
         f.write(Content)
     SubPath = outputFilePath
 
-def SetVAr():
-    IsHDTV = var.get()
-    print(f'h:{IsHDTV}')
-
-def SetVAr2():
-    IsNetflix = var2.get()
-    print(f'n:{IsNetflix}')
 
 def VarSet3():
     print(f'v:{var.get()}')
@@ -342,7 +380,7 @@ def update():
     SavePrevVariables()
     LoadPrevVariables()
     loadVariables()
-    FilePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\Movies\Subtitles\MajdSub_{Series}_S{SeasonSubName}E{EpisodeSubNAme}.srt'
+    FilePath = rf'{script_dir}\Subtitles\MajdSub_{Series}_S{SeasonSubName}E{EpisodeSubNAme}.srt'
 
 def get_show_id(SerieName):
     search_url = f"http://api.tvmaze.com/search/shows?q={SerieName}"
@@ -351,6 +389,7 @@ def get_show_id(SerieName):
     if data:
         return data[0]['show']['id']
     else:
+        messagebox.showerror("Error", "The Show season and nuber of episode is not found in the database. Try to change the name of the show (add spaces or remove numbers)")
         return None
 
 def get_seasons(show_id):
@@ -365,52 +404,148 @@ def get_episodes(season_id):
     data = response.json()
     return data
 
+
 def saveEpisode():
     global Episode
-    EpisodePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Episode.json'
+    EpisodePath = rf'{script_dir}\Episode.json'
     with open (EpisodePath, 'w') as file:
         json.dump({"variable": Episode}, file)
 
 def loadEpisode():
     global Episode
-    EpisodePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Episode.json'
+    EpisodePath = rf'{script_dir}\Episode.json'
     with open (EpisodePath, 'r') as file:
         data = json.load(file)
         Episode = data['variable']
 
 def saveSeason():
     global Season
-    SeasonPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Season.json'
+    SeasonPath = rf'{script_dir}\Season.json'
     with open (SeasonPath, 'w') as file:
         json.dump({"variable": Season}, file)
 
 def loadSeason():
     global Season
-    SeasonPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Season.json'
+    SeasonPath = rf'{script_dir}\Season.json'
     with open (SeasonPath, 'r') as file:
         data = json.load(file)
         Season = data['variable']
 
+
 def saveSeries():
     global Series
-    SeriesPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Series.json'
+    SeriesPath = rf'{script_dir}\Series.json'
     with open (SeriesPath, 'w') as file:
         json.dump({"variable": Series}, file)
 
 def loadSeries():
     global Series
-    SeriesPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\Series.json'
+    SeriesPath = rf'{script_dir}\Series.json'
     with open (SeriesPath, 'r') as file:
         data = json.load(file)
         Series = data['variable']
+
+def Save_OS_Login_data():
+    global OSUsername
+    global OSPassword
+    global APiKey
+    global script_dir
+    global SeriesFolder
+    SeriesFolderpath = rf'{script_dir}\SeriesFolder.json'
+    OSUsernamePath = rf'{script_dir}\OSUsername.json'
+    OSPasswordPath = rf'{script_dir}\OSPassword.json'
+    APiKeyPath = rf'{script_dir}\APiKey.json'
+    with open (OSUsernamePath, 'w') as file:
+        json.dump({"variable": OSUsername}, file)
+    with open (OSPasswordPath, 'w') as file:
+        json.dump({"variable": OSPassword}, file)
+    with open (APiKeyPath, 'w') as file:
+        json.dump({"variable": APiKey}, file)
+    with open (SeriesFolderpath, 'w') as file:
+        json.dump({"variable": SeriesFolder}, file)
+
+def Load_OS_Login_data():
+    global OSUsername
+    global OSPassword
+    global APiKey
+    global script_dir
+    global SeriesFolder
+
+    SeriesFolderpath = rf'{script_dir}\SeriesFolder.json'
+    OSUsernamePath = rf'{script_dir}\OSUsername.json'
+    OSPasswordPath = rf'{script_dir}\OSPassword.json'
+    APiKeyPath = rf'{script_dir}\APiKey.json'
+
+    with open (OSUsernamePath, 'r') as file:
+        data = json.load(file)
+        OSUsername = data['variable']
+
+
+    with open (OSPasswordPath, 'r') as file:
+        data = json.load(file)
+        OSPassword = data['variable']
+
+    with open (APiKeyPath, 'r') as file:
+        data = json.load(file)
+        APiKey = data['variable']
+    
+    with open (SeriesFolderpath, 'r') as file:
+        data = json.load(file)
+        SeriesFolder = data['variable']
+
+Load_OS_Login_data()
+
+def SaveVLCData():
+    global host
+    global port
+    global password
+    global Vlcpath
+    hostPath = rf'{script_dir}\host.json'
+    portPath = rf'{script_dir}\port.json'
+    passwordPath = rf'{script_dir}\password.json'
+    VlcpathPath = rf'{script_dir}\Vlcpath.json'
+    with open (hostPath, 'w') as file:
+        json.dump({"variable": host}, file)
+    with open (portPath, 'w') as file:
+        json.dump({"variable": port}, file)
+    with open (passwordPath, 'w') as file:
+        json.dump({"variable": password}, file)
+    with open (VlcpathPath, 'w') as file:
+        json.dump({"variable": Vlcpath}, file)
+
+def LoadVLCData():
+    global host
+    global port
+    global password
+    global Vlcpath
+    hostPath = rf'{script_dir}\host.json'
+    portPath = rf'{script_dir}\port.json'
+    passwordPath = rf'{script_dir}\password.json'
+    VlcpathPath = rf'{script_dir}\Vlcpath.json'
+
+    with open (hostPath, 'r') as file:
+        data = json.load(file)
+        host = data['variable']
+
+    with open (portPath, 'r') as file:
+        data = json.load(file)
+        port = data['variable']
+
+    with open (passwordPath, 'r') as file:
+        data = json.load(file)
+        password = data['variable']
+
+    with open (VlcpathPath, 'r') as file:
+        data = json.load(file)
+        Vlcpath = data['variable']
 
 def SavePrevVariables():
     global prevSeries
     global prevSeason
     global prevEpisode
-    prevSeriesPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevSeries.json'
-    prevSeasonPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevSeason.json'
-    prevEpisodePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevEpisode.json'
+    prevSeriesPath = rf'{script_dir}\prevSeries.json'
+    prevSeasonPath = rf'{script_dir}\prevSeason.json'
+    prevEpisodePath = rf'{script_dir}\prevEpisode.json'
     with open (prevSeriesPath, 'w') as file:
         json.dump({"variable": prevSeries}, file)
     with open (prevSeasonPath, 'w') as file:
@@ -423,18 +558,22 @@ def LoadPrevVariables():
     global prevSeason
     global prevEpisode
     global PrevLabel
-    prevSeriesPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevSeries.json'
-    prevSeasonPath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevSeason.json'
-    prevEpisodePath = rf'C:\Users\majdl\OneDrive\Desktop\Majd\CodeProjects\PythonSeriesplayer\prevEpisode.json'
+    prevSeriesPath = rf'{script_dir}\prevSeries.json'
+    prevSeasonPath = rf'{script_dir}\prevSeason.json'
+    prevEpisodePath = rf'{script_dir}\prevEpisode.json'
     with open (prevSeriesPath, 'r') as file:
         data = json.load(file)
         prevSeries = data['variable']
+
     with open (prevSeasonPath, 'r') as file:
         data = json.load(file)
         prevSeason = data['variable']
+
+
     with open (prevEpisodePath, 'r') as file:
         data = json.load(file)
         prevEpisode = data['variable']
+
 
 def saveVariables():
     saveEpisode()
@@ -454,6 +593,11 @@ def loadVariables():
     Seasonentry.insert(0, Season)
     Serieentry.delete(0, tk.END)
     Serieentry.insert(0, Series)
+
+
+Load_OS_Login_data()
+LoadVLCData()
+
 
 def redownload():
     login()
@@ -513,13 +657,226 @@ def NextSub():
     EncodeSRT(encoding='utf-8')
     change_subtitle_vlc_http(host, port, password, SubPath)
 
+def ShowSUbs():
+    winmdow = tk.Toplevel()
+    winmdow.title("Subtitles")
+    style = ttk.Style()
+    style.theme_use('vista')
+    winmdow.geometry("400x400")
+    winmdow.resizable(False, False)
+    global slug_file_id_list
+
+    List = tk.Listbox(winmdow, width=100, height=22, font=("Arial", 9), selectmode=tk.SINGLE, bg="gray", fg="black")
+    List.place(x=0, y=0)
+
+    for element in slug_file_id_list:
+        print(element['slug'])
+        List.insert(tk.END, element['slug'])
+    
+    DownloadSelection = ttk.Button(winmdow,text="Download selection")
+    DownloadSelection.place(x=260, y=360)
+
+    winmdow.mainloop()
+
+folder_selected2 = ""
+
+def setup():
+    global folder_selected
+    global SubPath
+    global host
+    global port
+    global password
+    global vlc
+    global FilePath
+    global SeriesFolder
+    global responsE
+    global entry1
+    global entry2
+    global entry3
+    global entry4
+    global folder_selected2
+    global Vlcpath
+
+    window = tk.Toplevel()
+    window.title("Set up")
+    style = ttk.Style()
+    style.theme_use('vista')
+    window.geometry("850x250")
+    window.resizable(False, False)
+
+    label1 = ttk.Label(window, text="The Series Foldor:", font=("Arial, 10"))
+    label1.place(x=20, y=10)
+
+    entry2 = ttk.Entry(window, width=30, font=("Arial, 9"))
+    entry2.place(x=130, y=10)
+    entry2.insert(0, SeriesFolder)
+
+    def SelectFolder():
+        global folder_selected
+        folder_selected = filedialog.askdirectory(title="Select a Folder")
+        entry2.delete(0, tk.END)
+        entry2.insert(0, folder_selected)
+
+
+    button1 = ttk.Button(window,text='Browse', command=SelectFolder)
+    button1.place(x=350, y=10)
+
+    label2 = ttk.Label(window, text="OpenSubtitle username:", font=("Arial, 10"))
+    label2.place(x=20, y=60)
+
+    entry3 = ttk.Entry(window, width=20, font=("Arial, 12"))
+    entry3.place(x=160, y=60)
+
+    label3 = ttk.Label(window, text="Opensubtitle password:", font=("Arial, 10"))
+    label3.place(x=20, y=110)
+
+    entry4 = ttk.Entry(window, width=20, font=("Arial, 12"), show="*")
+    entry4.place(x=160, y=110)
+
+    label = ttk.Label(window, text="Opensubtitle Api key:", font=("Arial, 10"))
+    label.place(x=20, y=160)
+
+    entry1 = ttk.Entry(window, width=50, font=("Arial", 9))
+    entry1.place(x=150, y=160)
+    entry1.insert(0, APiKey)
+
+    entry3.insert(0, OSUsername)
+    entry4.insert(0, OSPassword)
+
+    Error1 = ttk.Label(window, text="", font=("Arial, 10"))
+    Error1.place(x=180, y=210)
+
+    def logiN():
+        global OSUsername
+        global OSPassword
+        global APiKey
+        OSUsername = entry3.get()
+        OSPassword = entry4.get()
+        APiKey = entry1.get()
+        login()
+        print(responsE)
+        if  int(responsE) == 200:
+            Error1.config(text="Login successful", foreground="green")
+        else:
+            Error1.config(text="Login failed", foreground="red")
+        Save_OS_Login_data()
+        Load_OS_Login_data()
+    
+
+    login1 = ttk.Button(window, text="Login", command=logiN)
+    login1.place(x=100, y=210)
+
+    label4 = ttk.Label(window, text="Vlc path:", font=("Arial, 10"))
+    label4.place(x=450, y=10)
+
+    entry5 = ttk.Entry(window, width=30, font=("Arial, 9"))
+    entry5.place(x=530, y=10)
+    entry5.delete(0, tk.END)
+    entry5.insert(0, Vlcpath)
+
+    def SelectFolder2():
+        global folder_selected2
+        folder_selected2 = filedialog.askopenfilename(
+        title="Select an executable file",
+        filetypes=(("Executable files", "*.exe"), ("All files", "*.*"))
+        )
+        entry5.delete(0, tk.END)
+        entry5.insert(0, folder_selected2)
+        Vlcpath = folder_selected2
+        entry5.delete(0, tk.END)
+        entry5.insert(0, Vlcpath)
+        Vlcpath = entry5.get()
+
+    button1 = ttk.Button(window,text='Browse', command=SelectFolder2)
+    button1.place(x=750, y=10)
+
+    label5 = ttk.Label(window, text="Vlc http pasword:", font=("Arial, 10"))
+    label5.place(x=450, y=60)
+
+    label6 = ttk.Label(window, text="Vlc http port:", font=("Arial, 10"))
+    label6.place(x=450, y=110)
+
+    def update():
+        global SeriesFolder
+        global host
+        global port
+        global password
+        global FilePath
+        global SubPath
+        global Series
+        global Season
+        global Episode
+        global NameOfSeries
+        global THeSHowNAme
+        global prevSeries
+        global prevSeason
+        global prevEpisode
+        global Serieentry
+        global Seasonentry
+        global Episodeentry
+        global timeentry
+        global CurentLabel
+        global PrevLabel
+        global EpisodeSubNAme
+        global SeasonSubName
+        global OSUsername
+        global OSPassword
+        global APiKey
+        global Vlcpath
+        global responsE
+        SeriesFolder = entry2.get()
+        host = 'localhost'
+        port = '8080'
+        password = 'majd'
+        Vlcpath = entry5.get()
+        OSUsername = entry3.get()
+        OSPassword = entry4.get()
+        APiKey = entry1.get()
+        print(OSUsername)
+        print(OSPassword)
+        window.withdraw()
+        Save_OS_Login_data()
+        Load_OS_Login_data()
+        SaveVLCData()
+        LoadVLCData()
+
+    Save = ttk.Button(window, text="Save", command=update)
+    Save.place(x=20, y=210)
+
+    window.mainloop()
+
+def DownloadNextSub():
+    global current_index
+    global vlc
+    global SubPath
+    global host
+    global port
+    global password
+    if current_index < len(slug_file_id_list):
+        element = slug_file_id_list[current_index]
+        current_index += 1
+        CurrentSubName.config(text=f"Current Sub: {element['slug']}")
+        Id.FileID = element['file_id']
+    else:
+        messagebox.showinfo("Info", "End of list reached")
+    DownloadSub()
+    EncodeSRT(encoding='utf-8')
+
+
+
+
+
+
+
+
 ## GUI
 root = tk.Tk()
 root.title("MajdSub V1.0")
 style = ttk.Style()
 style.theme_use('vista')
 
-root.geometry("485x230")
+root.geometry("485x245+100+100")
+root.resizable(False, False)
 
 label = ttk.Label(root, text="Welcome to MajdSub V1.0", foreground="Black", font=("Arial", 15))
 label.pack()
@@ -528,21 +885,27 @@ action_button = ttk.Button(root, text="Play", command=play)
 action_button.place(x=400, y=200)
 
 action_button = ttk.Button(root, text="NextSub", command=NextSub)
-action_button.place(x=400, y=60)
+action_button.place(x=380, y=60)
+
+action_button = ttk.Button(root, text="Download Next", command=DownloadNextSub)
+action_button.place(x=280, y=60)
+
+action_button = ttk.Button(root, text="Show Subs", command=ShowSUbs)
+action_button.place(x=380, y=90)
 
 CurrentSubName = ttk.Label(root, text="SubName", foreground="Black", font=("Arial", 9))
-CurrentSubName.place(x=250, y=40)
+CurrentSubName.place(x=280, y=40)
 
-action_button = ttk.Button(root, text="Set up")
+action_button = ttk.Button(root, text="Set up", command=setup)
 action_button.place(x=310, y=200)
 
 action_button = ttk.Button(root, text="Update", command=update)
 action_button.place(x=220, y=200)
 
-action_button = ttk.Button(root, text="Show Subs")
-action_button.place(x=130, y=200)
+#action_button = ttk.Button(root, text="")
+#action_button.place(x=130, y=200)
 
-action_button = ttk.Button(root, text="Redownload Subs", command=redownload)
+action_button = ttk.Button(root, text="Redownload subs", command=redownload)
 action_button.place(x=10, y=200)
 
 TextVar = tk.StringVar()
@@ -590,7 +953,12 @@ loadVariables()
 CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
 PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
 
+Label = ttk.Label(root, text=f'Made by ❤️ by Majd', foreground="Black", font=("Arial", 7))
+Label.place(x=10, y=230)
+
+
 root.mainloop()
 
 
-## Made by love by Majd
+
+## Made by ❤️ by Majd
