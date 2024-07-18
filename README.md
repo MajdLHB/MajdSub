@@ -1,4 +1,4 @@
-Here is the revised README file for your GitHub repository, including the details from your screenshot and additional instructions.
+
 
 ```markdown
 # MajdSub
