@@ -18,6 +18,17 @@ A Python script in pre-alpha that integrates OpenSubtitle and Maze-TV APIs to fe
 - **Future Support for Movies**: Planned updates to handle movies.
 - **Multi-language Support**: Plans to expand subtitle download options to include all languages supported by OpenSubtitles.
 
+## Future Plans
+
+- **Support for Movies**: The script will be updated to handle movies, making it versatile for both TV series and films.
+- **Multi-language Support**: Plans to expand subtitle download options to include all languages supported by OpenSubtitles.
+- **Zip File Distribution**: Create a zip file that contains the entire app for easy distribution and setup.
+- **Executable File**: Develop an executable (.exe) version of the app for users who prefer not to run the script directly.
+- **First Full Release**: Work towards releasing the first full version of the app with all planned features and improvements.
+- **Cross-Platform Support**: Develop versions of the app for other operating systems such as macOS and Linux.
+- **Script Reorganization**: Reorganize the script to improve readability, maintainability, and performance.
+- **Enhanced Folder Recognition**: Implement smarter folder recognition to better handle various series and movie directory structures. 
+
 ## Installation
 
 1. **Clone the Repository**:
