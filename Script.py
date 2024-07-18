@@ -37,7 +37,7 @@ def replacespace(Name):
     return Name
 
 ## Variables
-NameOfPrevSeries = "Breaking Bad"
+NameOfPrevSeries = ""
 prevSeries = RemoveSpaceFromName(NameOfPrevSeries)
 prevSeason =5
 prevEpisode =4
@@ -140,10 +140,11 @@ def SearchForSub():
     global Id
     global fileID
     global responsE
+    global NameOfSeries
 
     url = "https://api.opensubtitles.com/api/v1/subtitles"
 
-    querystring = {"type": typeOfContent,"query": Series,"languages":"ar","season_number": Season,"episode_number": Episode}
+    querystring = {"type": typeOfContent, "query": NameOfSeries, "languages":"ar", "season_number": Season, "episode_number": Episode}
 
     headers = {
         "User-Agent": "<<MajdSub v0.1>>",
@@ -154,6 +155,7 @@ def SearchForSub():
     response1 = json.loads(response1.text)
     PageCount = response1['total_pages']
     Subtitles = response1['data']
+    print(response1)
 
 
     for subtitle in Subtitles:
@@ -289,6 +291,7 @@ def play():
     OpenFile(Series, Season, Episode)
     prevEpisode = Episode
     prevSeason = Season
+    NameOfPrevSeries = NameOfSeries
     prevSeries = Series
     EpisodeSubNAme = Episode
     SeasonSubName = Season
@@ -319,6 +322,8 @@ def play():
     LoadPrevVariables()
     CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
     PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
+    Serieentry.delete(0, tk.END)
+    Serieentry.insert(0, NameOfSeries)
     Seasonentry.delete(0, tk.END)
     Seasonentry.insert(0, Season)
     Episodeentry.delete(0, tk.END)
@@ -343,8 +348,6 @@ def EncodeSRT(encoding='utf-8'):
     SubPath = outputFilePath
 
 
-def VarSet3():
-    print(f'v:{var.get()}')
 
 def update():
     global FilePath
@@ -365,10 +368,25 @@ def update():
     global PrevLabel
     global EpisodeSubNAme
     global SeasonSubName
+    global OSUsername
+    global OSPassword
+    global APiKey
+    global Vlcpath
+    global SeriesFolder
+    global script_dir
+    global THeSHowNAme
     prevSeries = Series
     prevSeason = Season
     prevEpisode = Episode
     NameOfSeries = Serieentry.get()
+    print(NameOfSeries)
+    Serieentry.delete(0, tk.END)
+    Serieentry.insert(0, NameOfSeries)
+    print(NameOfSeries)
+    Series = RemoveSpaceFromName(NameOfSeries)
+    THeSHowNAme = replacespace(NameOfSeries)
+    print(Series)
+    print(Serieentry.get())
     Season = Seasonentry.get()
     Episode = Episodeentry.get()
     Delay = timeentry.get()
@@ -433,17 +451,21 @@ def loadSeason():
 
 
 def saveSeries():
-    global Series
+    global NameOfSeries
     SeriesPath = rf'{script_dir}\Series.json'
     with open (SeriesPath, 'w') as file:
-        json.dump({"variable": Series}, file)
+        json.dump({"variable": NameOfSeries}, file)
 
 def loadSeries():
+    global NameOfSeries
     global Series
+    global THeSHowNAme
     SeriesPath = rf'{script_dir}\Series.json'
     with open (SeriesPath, 'r') as file:
         data = json.load(file)
-        Series = data['variable']
+        NameOfSeries = data['variable']
+        Series = RemoveSpaceFromName(NameOfSeries)
+        THeSHowNAme = replacespace(NameOfSeries)
 
 def Save_OS_Login_data():
     global OSUsername
@@ -592,7 +614,7 @@ def loadVariables():
     Seasonentry.delete(0, tk.END)
     Seasonentry.insert(0, Season)
     Serieentry.delete(0, tk.END)
-    Serieentry.insert(0, Series)
+    Serieentry.insert(0, NameOfSeries)
 
 
 Load_OS_Login_data()
@@ -908,24 +930,25 @@ action_button.place(x=220, y=200)
 action_button = ttk.Button(root, text="Redownload subs", command=redownload)
 action_button.place(x=10, y=200)
 
-TextVar = tk.StringVar()
-Serieentry = ttk.Entry(root, textvariable=TextVar, width=20, font=("Arial", 9))
+
+Serieentry = ttk.Entry(root, width=20, font=("Arial", 9))
 Serieentry.place(x=100, y=40)
-Serieentry.insert(0, Series)
+Serieentry.insert(0, NameOfSeries)
+
 
 label = ttk.Label(root, text="Series Name:", foreground="Black", font=("Arial", 9))
 label.place(x=20, y=40)
 
-IntVar = tk.StringVar()
-Seasonentry = ttk.Entry(root, textvariable=IntVar, width=20, font=("Arial", 9))
+
+Seasonentry = ttk.Entry(root, width=20, font=("Arial", 9))
 Seasonentry.place(x=100, y=80)
 Seasonentry.insert(0, Season)
 
 label = ttk.Label(root, text="Season N::", foreground="Black", font=("Arial", 9))
 label.place(x=20, y=80)
 
-IntVar2 = tk.IntVar = tk.StringVar()
-Episodeentry = ttk.Entry(root, textvariable=IntVar2, width=20, font=("Arial", 9))
+
+Episodeentry = ttk.Entry(root, width=20, font=("Arial", 9))
 Episodeentry.place(x=100, y=120)
 Episodeentry.insert(0, Episode)
 
