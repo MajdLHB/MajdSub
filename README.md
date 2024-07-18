@@ -1,76 +1,98 @@
-# Subtitle Automation Script
+Here is the revised README file for your GitHub repository, including the details from your screenshot and additional instructions.
+
+```markdown
+# MajdSub
+```
 
 ## Overview
 
-This Python script automates the process of downloading and encoding subtitles for TV series. It leverages the OpenSubtitles API for subtitles and the Maze-TV API to track and manage episodes. The script is currently in beta mode and works with your local VLC media player to play episodes with the downloaded subtitles.
+A Python script in pre-alpha that integrates OpenSubtitle and Maze-TV APIs to fetch Arabic (and more languages) subtitles (and encode them in UTF-8) and episode counts, manages local series files, and controls VLC for seamless fullscreen playback with subtitles.
 
 ## Features
 
-- **Subtitle Download and Encoding**: Automatically downloads Arabic subtitles for your episodes and encodes them to UTF-8.
+- **Subtitle Download and Encoding**: Automatically downloads subtitles for your episodes and encodes them to UTF-8.
 - **Episode Tracking**: Uses the Maze-TV API to track the number of episodes in the series you are watching and saves the last episode you watched.
 - **Automated Playback**: Searches for the episode in your local files and opens it directly in VLC media player with the encoded subtitles.
 - **Next Episode Handling**: By pressing the 'Next' button, the script fetches the next available subtitle from OpenSubtitles and adds it to VLC.
 - **GUI**: Utilizes Tkinter for a user-friendly graphical interface.
-
-## Future Plans
-
-- **Support for Movies**: The script will be updated to handle movies, making it versatile for both TV series and films.
+- **Future Support for Movies**: Planned updates to handle movies.
 - **Multi-language Support**: Plans to expand subtitle download options to include all languages supported by OpenSubtitles.
 
 ## Installation
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/subtitle-automation-script.git
-   cd subtitle-automation-script
-Install Dependencies:
+   git clone https://github.com/MajdLHB/MajdSub.git
+   cd MajdSub
+   ```
 
-bash
-Copy code
-pip install -r requirements.txt
-Set Up VLC HTTP Interface:
+2. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Open VLC media player.
-Go to Tools > Preferences.
-Under Show settings, select All.
-Navigate to Interface > Main interfaces > Lua.
-Set the password and ensure the HTTP interface is enabled.
-Update the port and password in the script accordingly.
-Update Configuration:
+3. **Set Up VLC HTTP Interface**:
+   - Open VLC media player.
+   - Go to `Tools > Preferences`.
+   - Under `Show settings`, select `All`.
+   - Navigate to `Interface > Main interfaces > Lua`.
+   - Set the password and ensure the HTTP interface is enabled.
+   - Update the port and password in the script accordingly.
 
-Replace placeholder paths, API keys, and other configurations in the script with your own.
-Directory Structure
-The series must be organized as follows:
-A folder with the series name without spaces.
-Inside this folder, a subfolder for each season (e.g., s1 or S01).
-Each episode file must have the letter 'e' followed by the episode number in its name (e.g., e01).
-Usage
-Run the Script:
+4. **Update Configuration**:
+   - Replace placeholder paths, API keys, and other configurations in the script with your own.
 
-bash
-Copy code
-python main.py
-Graphical User Interface:
+## Directory Structure
 
-Use the GUI to select the series and episode you want to watch.
-The script will handle downloading and encoding the subtitle, then open the episode in VLC.
-Contributing
+- The series must be organized as follows:
+  - A folder with the series name without spaces.
+  - Inside this folder, a subfolder for each season (e.g., `s1` or `S01`).
+  - Each episode file must have the letter 'e' followed by the episode number in its name (e.g., `e01`).
+
+## Usage
+
+1. **Run the Script**:
+   ```bash
+   python script.py
+   ```
+
+2. **Graphical User Interface**:
+   - Use the GUI to select the series and episode you want to watch.
+   - The script will handle downloading and encoding the subtitle, then open the episode in VLC.
+
+## Configuration Files
+
+- **APIKey.json**: Store your API key for OpenSubtitles.
+- **Episode.json**: Configuration for the current episode.
+- **OSPassword.json**: Store your OpenSubtitles password.
+- **OSUsername.json**: Store your OpenSubtitles username.
+- **PrevEpisode.json**: Store information about the previous episode watched.
+- **PrevSeason.json**: Store information about the previous season watched.
+- **PrevSeries.json**: Store information about the previous series watched.
+
+## Contributing
+
 Feel free to contribute to the project by:
+- Forking the repository.
+- Creating a new branch (`git checkout -b feature-branch`).
+- Making your changes.
+- Submitting a pull request.
 
-Forking the repository.
-Creating a new branch (git checkout -b feature-branch).
-Making your changes.
-Submitting a pull request.
-License
-This project is open-source and available under the MIT License. See the LICENSE file for more information.
+## License
 
-Support
-For any issues or feature requests, please open an issue on the GitHub repository.
+This project is open-source and available under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
-Acknowledgments
-OpenSubtitles API for providing subtitle data.
-Maze-TV API for episode tracking.
-VLC Media Player for media playback.
-Note: This script is still in beta mode. Please ensure you update the file paths, API keys, and other configurations to match your setup.
+## Support
 
-Feel free to adjust the content as per your specific requirements or preferences.
+For any issues or feature requests, please open an issue on the [GitHub repository](https://github.com/MajdLHB/MajdSub/issues).
+
+## Acknowledgments
+
+- [OpenSubtitles API](https://www.opensubtitles.com) for providing subtitle data.
+- [Maze-TV API](https://www.maze.tv) for episode tracking.
+- [VLC Media Player](https://www.videolan.org/vlc/index.html) for media playback.
+
+---
+
+**Note**: This script is still in pre-alpha mode. Please ensure you update the file paths, API keys, and other configurations to match your setup.
+
