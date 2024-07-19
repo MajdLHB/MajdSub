@@ -976,7 +976,7 @@ loadVariables()
 CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
 PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
 
-Label = ttk.Label(root, text=f'Made by ❤️ by Majd', foreground="Black", font=("Arial", 7))
+Label = ttk.Label(root, text=f'Made with ❤️ by Majd', foreground="Black", font=("Arial", 7))
 Label.place(x=10, y=230)
 
 
@@ -984,4 +984,4 @@ root.mainloop()
 
 
 
-## Made by ❤️ by Majd
+## Made with ❤️ by Majd
