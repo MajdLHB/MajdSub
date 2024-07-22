@@ -1,9 +1,5 @@
 
 
-```markdown
-# MajdSub
-```
-
 ## Overview
 
 A Python script in pre-alpha that integrates OpenSubtitle and Maze-TV APIs to fetch Arabic (and more languages) subtitles (and encode them in UTF-8) and episode counts, manages local series files, and controls VLC for seamless fullscreen playback with subtitles.
