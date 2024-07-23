@@ -27,6 +27,8 @@ import time
 from tkinter import messagebox
 import subprocess
 from tkinter import filedialog
+import difflib
+
 
 def RemoveSpaceFromName(Name):
     Name = Name.replace(" ", "")
@@ -49,6 +51,7 @@ entry2 = ""
 entry3 = ""
 entry4 = ""
 
+Language = "ar"
 
 script_path = os.path.abspath(__file__)
 script_dir = os.path.split(script_path)[0]
@@ -85,7 +88,13 @@ SUbToDownload = []
 
 DownloadURL = []
 
+if not os.path.exists(rf'{script_dir}\Subtitles'):
+    os.makedirs(rf'{script_dir}\Subtitles')
+    FilePath = rf'{script_dir}\Subtitles\MajdSub_{Series}_S{Season}E{Episode}.srt'
+
 FilePath = rf'{script_dir}\Subtitles\MajdSub_{Series}_S{Season}E{Episode}.srt'
+
+
 SeriesFolder = rf''
 SubPath = ""
 
@@ -144,7 +153,7 @@ def SearchForSub():
 
     url = "https://api.opensubtitles.com/api/v1/subtitles"
 
-    querystring = {"type": typeOfContent, "query": NameOfSeries, "languages":"ar", "season_number": Season, "episode_number": Episode}
+    querystring = {"type": typeOfContent, "query": NameOfSeries, "languages": Language, "season_number": Season, "episode_number": Episode}
 
     headers = {
         "User-Agent": "<<MajdSub v0.1>>",
@@ -199,64 +208,131 @@ def DownloadSub():
     with open (FilePath, 'wb') as file:
         file.write(response3.content)
         print('Downloaded')
+IsMovie = False
 
-def OpenFile(Series, Season, Episode):
+def OpenFile(SeriesFolder, Series, Season, Episode):
     global Vlcpath
     global SubPath
-    print(f'{Series} S{Season} E{Episode}')
-    matching_files = []
-    CorrectFiles = []
-    correctfile = ""
-    episodepathlist = []
-    episodePath = ""
-    target_pattern = re.compile(r'.*\b{}\b.*'.format(re.escape(Series)))
-    for root, dirs, files in os.walk(SeriesFolder):
-        for file_name in dirs:
-            if target_pattern.search(file_name):
-                matching_files.append(os.path.join(root, file_name))
+    global IsMovie
+    if not IsMovie:
+        FirstLetter = Series[0].lower()
+        LastLetter = Series[-1].lower()
+        match_list = []
+        dirname_list = []
+        series_pattern = Series.replace(" ", r"[.\-_]*")
+        pattern = re.compile(rf"(?i)\b{series_pattern}\b")
+        for root, dirs, files in os.walk(Series):
+            for file in files:
+                if pattern.search(file):
+                    match_list.append(os.path.join(root, file))
+                    dirname_list.append(dirname)
+        if len(match_list) == 0:
+            for dirpath, dirnames, filenames in os.walk(SeriesFolder):
+                for dirname in dirnames:
+                    if FirstLetter in dirname.lower():
+                        Start_index = dirname.lower().index(FirstLetter)
+                        if LastLetter in dirname[Start_index:]:
+                            last_index = dirname[Start_index:].index(LastLetter) + Start_index 
+                            match_str = dirname[Start_index:last_index + 1]
+                            match_list.append(match_str)
+                            dirname_list.append(os.path.join(dirpath, dirname))
+            if len(match_list) == 0:
+                messagebox.showerror("Error", "No matching series found")
+                return
+                
+        def similarity(a, b):
+            a = re.sub(r'[^\w\s]', '', a.lower())
+            b = re.sub(r'[^\w\s]', '', b.lower())
+            return difflib.SequenceMatcher(None, a, b).ratio()
+        
+        selected_dir = []
+
+        for match, dirname in zip(match_list, dirname_list):
+            if similarity(match, Series) >= 0.75:
+                selected_dir.append(dirname)
+
+        
+        if not selected_dir and dirname_list:
+            selected_dir.append(random.choice(dirname_list))
+
+
+        season_patterns = [
+            f'Season{Season}', f'SEASON 0{Season}', f'season 0{Season}', 
+            f'S0{Season}', f's0{Season}', f'S{Season}', f's{Season}',
+            f'Season.0{Season}', f'SEASON.0{Season}', f'Season.{Season}', 
+            f'SEASON.{Season}', f'Season-0{Season}', f'SEASON-0{Season}'
+            ]
             
-    matchingFile = str(random.choice(matching_files))
-    matchingFile = matchingFile.replace('/', '\\')
-    print(matchingFile)
-    for root, dirs, files in os.walk(matchingFile):
-        for file in dirs:
-            if f'S{Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file))
-            elif f'season {Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file))
-            elif f'S0{Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file)) 
-            elif f's0{Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file)) 
-            elif f'Season {Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file)) 
-            elif f'Season 0{Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file)) 
-            elif f'season 0{Season}' in dirs:
-                CorrectFiles.append(os.path.join(root, file))     
-    correctfile = str(random.choice(CorrectFiles))
-    for root, dirs, files in os.walk(correctfile):
-        for file in files:
-            if f'E{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'E0{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'Episode {Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'episode {Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'episode 0{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'Episode 0{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'e0{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-            elif f'e{Episode}' in file:
-                episodepathlist.append(os.path.join(root, file))
-    episodePath = str(random.choice(episodepathlist))
-    episodePath = episodePath.replace('/', '\\')
+        SeasonFolder = []
+
+        for season_pattern in season_patterns:
+            for SelectedDir in selected_dir:
+                if season_pattern in SelectedDir:
+                    seasondir = os.path.join(SelectedDir)
+                    SeasonFolder.append(seasondir)
+                    break
+                else:
+                    for SelectedDir in selected_dir:
+                        for root, dirs, files in os.walk(SelectedDir):
+                            for dir in dirs:
+                                if season_pattern in dir:
+                                    seasonDir = os.path.join(root, dir)
+                                    SeasonFolder.append(seasonDir)
+                                    break
+
+        episode_patterns = [
+            f'Episode{Episode}', f'EPISODE 0{Episode}', f'episode 0{Episode}', 
+            f'E0{Episode}', f'e0{Episode}', f'E{Episode}', f'e{Episode}',
+            f'Episode.0{Episode}', f'EPISODE.0{Episode}', f'Episode.{Episode}', 
+            f'EPISODE.{Episode}', f'Episode-0{Episode}', f'EPISODE-0{Episode}'
+            ]
+        
+        episodePath = None
+        matchedepisodes = []
+
+        for episode_pattern in episode_patterns:
+            #print(episode_pattern)
+            for Seasonfolder in SeasonFolder:
+                #print(Seasonfolder)
+                for root, dirs, files in os.walk(Seasonfolder):
+                    #print(files)
+                    for file in files:
+                        #print(file)
+                        if episode_pattern in file:
+                            Epath = os.path.join(Seasonfolder, file)
+                            matchedepisodes.append(Epath)
+                            #print(f"Episode {Episode} found in {Seasonfolder}")
+                            if 'mp4' in Epath or 'mkv' in Epath or 'avi' in Epath or 'flv' in Epath or 'mov' in Epath or 'wmv' in Epath or 'webm' in Epath or 'm4v' in Epath or '3gp' in Epath or '3g2' in Epath or 'mpg' in Epath or 'mpeg' in Epath or 'm2v' in Epath or 'm4v' in Epath or 'ts' in Epath or 'vob' in Epath or 'divx' in Epath or 'xvid' in Epath or 'f4v' in Epath or 'rm' in Epath or 'rmvb' in Epath or 'ogv' in Epath or 'ogm' in Epath or 'ogx' in Epath or 'mts' in Epath or 'm2ts' in Epath:
+                                break
+
+
+                        else:
+                            episodePath = None
+                            #print(f"Episode {Episode} not found in {Seasonfolder}")
+
+
+        if matchedepisodes == []:
+            for folder in SeasonFolder:
+                for root, dirs, files in os.walk(folder):
+                    files.sort()
+                    if len(files) >= int(Episode):
+                        Epath = os.path.join(Seasonfolder, file)
+                        #print(f"Episode {Episode} found in {folder}")
+                        matchedepisodes.append(Epath)
+                        break
+
+        if matchedepisodes == None:
+            root = Tk()
+            root.withdraw()
+            messagebox.showerror("Error", "Episode not found")
+            root.destroy()
     
-    print(episodePath)
+    #print(matchedepisodes)
+    #print(episodePath)
+    episodePath = random.choice(matchedepisodes)
+    episodePath = episodePath.replace('/', '\\')
+    #print(f"Opening {episodePath}")
+
     vlc_command = [
     Vlcpath,
     '--extraintf', 'http',
@@ -288,7 +364,7 @@ def play():
     SearchForSub()
     DownloadSub()
     EncodeSRT(encoding='utf-8')
-    OpenFile(Series, Season, Episode)
+    OpenFile(SeriesFolder, Series, Season, Episode)
     prevEpisode = Episode
     prevSeason = Season
     NameOfPrevSeries = NameOfSeries
@@ -976,7 +1052,7 @@ loadVariables()
 CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
 PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
 
-Label = ttk.Label(root, text=f'Made with ❤️ by Majd', foreground="Black", font=("Arial", 7))
+Label = ttk.Label(root, text=f'Made by ❤️ by Majd', foreground="Black", font=("Arial", 7))
 Label.place(x=10, y=230)
 
 
@@ -984,4 +1060,4 @@ root.mainloop()
 
 
 
-## Made with ❤️ by Majd
+## Made by ❤️ by Majd
