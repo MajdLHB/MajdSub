@@ -38,6 +38,16 @@ def replacespace(Name):
     Name = Name.replace(" ", "+")
     return Name
 
+#vlc_path = "C:\\Program Files\\VideoLAN\\VLC"
+
+
+#os.environ["PATH"] += os.pathsep + vlc_path
+
+
+#subprocess.run([
+ #   'setx', 'PATH', os.environ["PATH"]
+#], shell=True)
+
 ## Variables
 NameOfPrevSeries = ""
 prevSeries = RemoveSpaceFromName(NameOfPrevSeries)
@@ -70,12 +80,11 @@ SeasonSubName = ""
 fileID =0
 
 Delay = 0
-IsHDTV = True
-IsNetflix = True
+
 
 host = 'localhost'  
-port = '8080'       
-password = 'majd'
+port = ''       
+password = ''
 
 slug_file_id_list = []
 slugList = []
@@ -260,7 +269,13 @@ def OpenFile(SeriesFolder, Series, Season, Episode):
             f'Season{Season}', f'SEASON 0{Season}', f'season 0{Season}', 
             f'S0{Season}', f's0{Season}', f'S{Season}', f's{Season}',
             f'Season.0{Season}', f'SEASON.0{Season}', f'Season.{Season}', 
-            f'SEASON.{Season}', f'Season-0{Season}', f'SEASON-0{Season}'
+            f'SEASON.{Season}', f'Season-0{Season}', f'SEASON-0{Season}',
+            f'Season {Season}', f'SEASON {Season}', f'season {Season}',
+            f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}',
+            f'Season_{Season}', f'SEASON_{Season}', f'season_{Season}',
+            f'Season[0{Season}]', f'SEASON[0{Season}]', f'season[0{Season}]',
+            f'Season 0{Season}', f'SEASON 0{Season}', f'season 0{Season}',
+            f'Season-0{Season}', f'SEASON-0{Season}', f'season-0{Season}'
             ]
             
         SeasonFolder = []
@@ -322,7 +337,7 @@ def OpenFile(SeriesFolder, Series, Season, Episode):
                         break
 
         if matchedepisodes == None:
-            root = Tk()
+            root = tk()
             root.withdraw()
             messagebox.showerror("Error", "Episode not found")
             root.destroy()
@@ -451,6 +466,9 @@ def update():
     global SeriesFolder
     global script_dir
     global THeSHowNAme
+    global Language
+    global langentry
+    Language = langentry.get()
     prevSeries = Series
     prevSeason = Season
     prevEpisode = Episode
@@ -542,6 +560,19 @@ def loadSeries():
         NameOfSeries = data['variable']
         Series = RemoveSpaceFromName(NameOfSeries)
         THeSHowNAme = replacespace(NameOfSeries)
+
+def saveLanguage():
+    global Language
+    LanguagePath = rf'{script_dir}\Language.json'
+    with open (LanguagePath, 'w') as file:
+        json.dump({"variable": Language}, file)
+
+def loadLanguage():
+    global Language
+    LanguagePath = rf'{script_dir}\Language.json'
+    with open (LanguagePath, 'r') as file:
+        data = json.load(file)
+        Language = data['variable']
 
 def Save_OS_Login_data():
     global OSUsername
@@ -677,20 +708,30 @@ def saveVariables():
     saveEpisode()
     saveSeason()
     saveSeries()
+    saveLanguage()
 
 def loadVariables():
     global Episodeentry
     global Seasonentry
     global Serieentry
+    global Episode
+    global Season
+    global NameOfSeries
+    global Language
+    global langentry
     loadEpisode()
     loadSeason()
     loadSeries()
+    loadLanguage()
     Episodeentry.delete(0, tk.END)
     Episodeentry.insert(0, Episode)
     Seasonentry.delete(0, tk.END)
     Seasonentry.insert(0, Season)
     Serieentry.delete(0, tk.END)
     Serieentry.insert(0, NameOfSeries)
+    langentry.delete(0, tk.END)
+    langentry.insert(0, Language)
+
 
 
 Load_OS_Login_data()
@@ -1031,12 +1072,19 @@ Episodeentry.insert(0, Episode)
 label = ttk.Label(root, text="Episode N:", foreground="Black", font=("Arial", 9))
 label.place(x=20, y=120)
 
-timeentry = ttk.Entry(root, textvariable=Delay, width=20, font=("Arial", 9))
+timeentry = ttk.Entry(root, width=7, font=("Arial", 9))
 timeentry.place(x=100, y=160)
 timeentry.insert(0, Delay)
 
 label = ttk.Label(root, text="Time shift:", foreground="Black", font=("Arial", 9))
 label.place(x=20, y=160)
+
+langentry = ttk.Entry(root, width=6, font=("Arial", 9))
+langentry.place(x=200, y=160)
+langentry.insert(0, Language)
+
+lang = ttk.Label(root, text="lang:", foreground="Black", font=("Arial", 9))
+lang.place(x=160, y=160)
 
 CurentLabel = ttk.Label(root, text=f'Current video: {Series} S{Season} E{Episode}', foreground="Black", font=("Arial", 9))
 CurentLabel.place(x=280, y=160)
@@ -1052,7 +1100,7 @@ loadVariables()
 CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
 PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
 
-Label = ttk.Label(root, text=f'Made by ❤️ by Majd', foreground="Black", font=("Arial", 7))
+Label = ttk.Label(root, text=f'Made with ❤️ by Majd', foreground="Black", font=("Arial", 7))
 Label.place(x=10, y=230)
 
 
@@ -1060,4 +1108,4 @@ root.mainloop()
 
 
 
-## Made by ❤️ by Majd
+## Made with ❤️ by Majd
