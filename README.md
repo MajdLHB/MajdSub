@@ -9,7 +9,7 @@ A Python script in pre-alpha that integrates OpenSubtitle and Maze-TV APIs to fe
 This script is in pre-alpha. It has glitches and some missing functionalities.So for now you can use:
 - **The update button:** to update the information about the episode you will watch (The movies will be supported soon)
 - **The play button:** to play the current episode at fullsecreen in vlc with subtitle
-- **Redownload sub button** to redownload it at the same adress
+- **Redownload sub button** to redownload the subtitle with the same setting
 - **The next subtitle button:** to download the next sub and add it to Vlc directly
 - **The show subs button:** just to see availble subs
 Any other buttons will be working as soon as possible.
