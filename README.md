@@ -11,7 +11,8 @@ This script is in pre-alpha. It has glitches and some missing functionalities.So
 - **The play button:** to play the current episode at fullsecreen in vlc with subtitle
 - **Redownload sub button** to redownload the subtitle with the same setting
 - **The next subtitle button:** to download the next sub and add it to Vlc directly
-- **The show subs button:** just to see availble subs
+- **The show subs button:** just to see availble subs.
+
 Any other buttons will be working as soon as possible.
 
 
