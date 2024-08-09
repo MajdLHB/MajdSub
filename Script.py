@@ -38,15 +38,6 @@ def replacespace(Name):
     Name = Name.replace(" ", "+")
     return Name
 
-#vlc_path = "C:\\Program Files\\VideoLAN\\VLC"
-
-
-#os.environ["PATH"] += os.pathsep + vlc_path
-
-
-#subprocess.run([
- #   'setx', 'PATH', os.environ["PATH"]
-#], shell=True)
 
 ## Variables
 NameOfPrevSeries = ""
@@ -147,10 +138,7 @@ def login():
 
 
 
-def SearchForSub():
-    global Series
-    global Season
-    global Episode
+def SearchForSub(Series, Season, Episode):
     global typeOfContent
     global slug_file_id_list
     global SUbToDownload
@@ -376,7 +364,7 @@ def play():
     global EpisodeSubNAme
     global SeasonSubName
     login()
-    SearchForSub()
+    SearchForSub(Series, Season, Episode)
     DownloadSub()
     EncodeSRT(encoding='utf-8')
     OpenFile(SeriesFolder, Series, Season, Episode)
@@ -739,8 +727,18 @@ LoadVLCData()
 
 
 def redownload():
-    login()
-    SearchForSub()
+    global current_index
+    global vlc
+    global SubPath
+    global host
+    global port
+    global password
+    if current_index < len(slug_file_id_list):
+        element = slug_file_id_list[current_index]
+        CurrentSubName.config(text=f"Current Sub: {element['slug']}")
+        Id.FileID = element['file_id']
+    else:
+        messagebox.showinfo("Info", "End of list reached")
     DownloadSub()
     EncodeSRT(encoding='utf-8')
 
@@ -812,8 +810,8 @@ def ShowSUbs():
         print(element['slug'])
         List.insert(tk.END, element['slug'])
     
-    DownloadSelection = ttk.Button(winmdow,text="Download selection")
-    DownloadSelection.place(x=260, y=360)
+    #DownloadSelection = ttk.Button(winmdow,text="Download selection")
+    #DownloadSelection.place(x=260, y=360)
 
     winmdow.mainloop()
 
@@ -932,8 +930,26 @@ def setup():
     label5 = ttk.Label(window, text="Vlc http pasword:", font=("Arial, 10"))
     label5.place(x=450, y=60)
 
+    entry6 = ttk.Entry(window, width=20, font=("Arial, 12"), show="*")
+    entry6.place(x=580, y=60)
+    entry6.delete(0, tk.END)
+    entry6.insert(0, password)
+
     label6 = ttk.Label(window, text="Vlc http port:", font=("Arial, 10"))
     label6.place(x=450, y=110)
+
+    entry7 = ttk.Entry(window, width=20, font=("Arial, 12"))
+    entry7.place(x=580, y=110)
+    entry7.delete(0, tk.END)
+    entry7.insert(0, port)
+
+    label7 = ttk.Label(window, text="Vlc http host:", font=("Arial, 10"))
+    label7.place(x=450, y=160)
+
+    entry8 = ttk.Entry(window, width=20, font=("Arial, 12"))
+    entry8.place(x=580, y=160)
+    entry8.delete(0, tk.END)
+    entry8.insert(0, host)
 
     def update():
         global SeriesFolder
@@ -964,9 +980,9 @@ def setup():
         global Vlcpath
         global responsE
         SeriesFolder = entry2.get()
-        host = 'localhost'
-        port = '8080'
-        password = 'majd'
+        host = entry8.get()
+        port = entry7.get()
+        password = entry6.get()
         Vlcpath = entry5.get()
         OSUsername = entry3.get()
         OSPassword = entry4.get()
@@ -1002,10 +1018,22 @@ def DownloadNextSub():
     EncodeSRT(encoding='utf-8')
 
 
+def downloadSub():
+    global Series
+    global Season
+    global Episode
+    login()
+    SearchForSub(Series, Season, Episode)
+    DownloadSub()
+    EncodeSRT(encoding='utf-8')
 
 
+os.environ["PATH"] += os.pathsep + Vlcpath
 
 
+subprocess.run([
+    'setx', 'PATH', os.environ["PATH"]
+], shell=True)
 
 
 ## GUI
@@ -1031,6 +1059,9 @@ action_button.place(x=280, y=60)
 
 action_button = ttk.Button(root, text="Show Subs", command=ShowSUbs)
 action_button.place(x=380, y=90)
+
+action_button = ttk.Button(root, text="Download sub", command=downloadSub)
+action_button.place(x=280, y=90)
 
 CurrentSubName = ttk.Label(root, text="SubName", foreground="Black", font=("Arial", 9))
 CurrentSubName.place(x=280, y=40)
