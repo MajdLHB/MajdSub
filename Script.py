@@ -418,9 +418,17 @@ def EncodeSRT(encoding='utf-8'):
     global Series
     global prevSeason
     global prevEpisode
-    outputFilePath = FilePath.replace('MajdSub', 'MajdSubV1')
+    
     with open(FilePath, 'r', encoding='utf-8') as f:
         Content = f.read()
+
+    outputFilePath = FilePath.replace('MajdSub', 'MajdSubV1')
+    outputDir = os.path.dirname(outputFilePath)
+
+    
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
+
     
     with open(outputFilePath, 'w', encoding=encoding) as f:
         f.write(Content)
