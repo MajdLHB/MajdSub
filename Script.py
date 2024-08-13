@@ -47,10 +47,10 @@ prevEpisode =4
 
 responsE = ""
 
-entry1 = ""
-entry2 = ""
-entry3 = ""
-entry4 = ""
+#entry1 = ""
+#entry2 = ""
+#entry3 = ""
+#entry4 = ""
 
 Language = "ar"
 
@@ -389,16 +389,17 @@ def play():
                 SeasonID = season['id']
                 Episodes = get_episodes(SeasonID)
                 num_episodes = len(Episodes)
-    Episode = int(Episode) + 1
+    Episode = int(Episode)
     if (Episode < num_episodes):
-        Episode = Episode
+        Episode += 1
     elif (Episode > num_episodes):
         Episode = 1
         Season = int(Season) + 1
+    Episodeentry.delete(0, tk.END)
+    Episodeentry.insert(0, Episode)
+    Seasonentry.delete(0, tk.END)
+    Seasonentry.insert(0, Season)
     change_subtitle_vlc_http(host, port, password, SubPath)
-    
-    SavePrevVariables()
-    LoadPrevVariables()
     CurentLabel.config(text=f'Current video: {Series} S{Season} E{Episode}')
     PrevLabel.config(text=f'Previous video: {prevSeries} S{prevSeason} E{prevEpisode}')
     Serieentry.delete(0, tk.END)
@@ -418,17 +419,9 @@ def EncodeSRT(encoding='utf-8'):
     global Series
     global prevSeason
     global prevEpisode
-    
+    outputFilePath = FilePath.replace('MajdSub', 'MajdSubV1')
     with open(FilePath, 'r', encoding='utf-8') as f:
         Content = f.read()
-
-    outputFilePath = FilePath.replace('MajdSub', 'MajdSubV1')
-    outputDir = os.path.dirname(outputFilePath)
-
-    
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
-
     
     with open(outputFilePath, 'w', encoding=encoding) as f:
         f.write(Content)
@@ -475,8 +468,6 @@ def update():
     print(NameOfSeries)
     Series = RemoveSpaceFromName(NameOfSeries)
     THeSHowNAme = replacespace(NameOfSeries)
-    print(Series)
-    print(Serieentry.get())
     Season = Seasonentry.get()
     Episode = Episodeentry.get()
     Delay = timeentry.get()
