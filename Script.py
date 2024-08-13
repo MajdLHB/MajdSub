@@ -39,6 +39,8 @@ def replacespace(Name):
     return Name
 
 
+current_subtitle_index = 0
+
 ## Variables
 NameOfPrevSeries = ""
 prevSeries = RemoveSpaceFromName(NameOfPrevSeries)
@@ -284,10 +286,10 @@ def OpenFile(SeriesFolder, Series, Season, Episode):
                                     break
 
         episode_patterns = [
-            f'Episode{Episode}', f'EPISODE 0{Episode}', f'episode 0{Episode}', 
-            f'E0{Episode}', f'e0{Episode}', f'E{Episode}', f'e{Episode}',
-            f'Episode.0{Episode}', f'EPISODE.0{Episode}', f'Episode.{Episode}', 
-            f'EPISODE.{Episode}', f'Episode-0{Episode}', f'EPISODE-0{Episode}'
+            f'EPISODE 0{Episode}', f'episode 0{Episode}', 
+            f'E0{Episode}', f'e0{Episode}', 
+            f'Episode.0{Episode}', f'EPISODE.0{Episode}',
+            f'Episode-0{Episode}', f'EPISODE-0{Episode}'
             ]
         
         episodePath = None
@@ -363,7 +365,11 @@ def play():
     global Episodeentry
     global EpisodeSubNAme
     global SeasonSubName
+    global current_subtitle_index
+    current_subtitle_index = 0
     login()
+    saveVariables()
+    loadVariables()
     SearchForSub(Series, Season, Episode)
     DownloadSub()
     EncodeSRT(encoding='utf-8')
@@ -395,6 +401,7 @@ def play():
     elif (Episode > num_episodes):
         Episode = 1
         Season = int(Season) + 1
+
     Episodeentry.delete(0, tk.END)
     Episodeentry.insert(0, Episode)
     Seasonentry.delete(0, tk.END)
@@ -409,8 +416,10 @@ def play():
     Episodeentry.delete(0, tk.END)
     Episodeentry.insert(0, Episode)
     saveVariables()
+    SavePrevVariables()
+    LoadPrevVariables()
     loadVariables()
-    print(prevEpisode)
+    print(f'prev:{prevEpisode}')
 
 
 def EncodeSRT(encoding='utf-8'):
@@ -741,14 +750,12 @@ def redownload():
     DownloadSub()
     EncodeSRT(encoding='utf-8')
 
-current_subtitle_index = 0
 def change_to_next_subtitle_vlc_http(host, port, password):
     global current_subtitle_index
-    current_subtitle_index += 1
     url = f'http://{host}:{port}/requests/status.xml'
     headers = {'User-Agent': 'Mozilla/5.0'}
     auth = requests.auth.HTTPBasicAuth('', password)  
-
+    current_subtitle_index += 1 #Delete this if your video has only one subtitle track
     next_subtitle_index = current_subtitle_index + 1
 
     # VLC uses 0-based index for subtitle tracks
