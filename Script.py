@@ -111,8 +111,8 @@ APiKey = "TD36XSkIVGJwXZfAlayTeEl4usDj5dqi"
 Vlcpath = "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"
 
 ## VAriable Class
-class Id:
-    FileID = 0
+#class Id:
+    #FileID = 0
 
 ## Functions
 def login():
@@ -145,7 +145,7 @@ def SearchForSub(Series, Season, Episode):
     global slug_file_id_list
     global SUbToDownload
     global APiKey
-    global Id
+    #global Id
     global fileID
     global responsE
     global NameOfSeries
@@ -180,17 +180,19 @@ def SearchForSub(Series, Season, Episode):
         print('No subtitles found')
     
     fileID = SUbToDownload[0]
-    Id.FileID = fileID
+    #Id.FileID = fileID
     
 
 def DownloadSub():
-    global Id
+    #global Id
     global Delay
     global APiKey
     global FilePath
+    global fileID
+    global CurrentSubName
     url = "https://api.opensubtitles.com/api/v1/download"
 
-    payload = {"file_id": Id.FileID, "timeshift": Delay}
+    payload = {"file_id": fileID, "timeshift": Delay}
     
     headers = {
         "User-Agent": "<<MajdSub V1.0>>",
@@ -207,6 +209,7 @@ def DownloadSub():
     with open (FilePath, 'wb') as file:
         file.write(response3.content)
         print('Downloaded')
+    
 IsMovie = False
 
 def OpenFile(SeriesFolder, Series, Season, Episode):
@@ -741,10 +744,13 @@ def redownload():
     global host
     global port
     global password
+    global slug_file_id_list
+    global fileID
+    global CurrentSubName
     if current_index < len(slug_file_id_list):
         element = slug_file_id_list[current_index]
         CurrentSubName.config(text=f"Current Sub: {element['slug']}")
-        Id.FileID = element['file_id']
+        fileID = element['file_id']
     else:
         messagebox.showinfo("Info", "End of list reached")
     DownloadSub()
@@ -755,9 +761,8 @@ def change_to_next_subtitle_vlc_http(host, port, password):
     url = f'http://{host}:{port}/requests/status.xml'
     headers = {'User-Agent': 'Mozilla/5.0'}
     auth = requests.auth.HTTPBasicAuth('', password)  
-    current_subtitle_index += 1 #Delete this if your video has only one subtitle track
+    current_subtitle_index = current_subtitle_index + 1
     next_subtitle_index = current_subtitle_index + 1
-
     # VLC uses 0-based index for subtitle tracks
     params = {'command': 'subtitle_track', 'val': next_subtitle_index}
 
@@ -789,11 +794,14 @@ def NextSub():
     global host
     global port
     global password
+    global slug_file_id_list
+    global fileID
+    global CurrentSubName
     if current_index < len(slug_file_id_list):
         element = slug_file_id_list[current_index]
         current_index += 1
         CurrentSubName.config(text=f"Current Sub: {element['slug']}")
-        Id.FileID = element['file_id']
+        fileID = element['file_id']
     else:
         messagebox.showinfo("Info", "End of list reached")
     DownloadSub()
@@ -1013,11 +1021,14 @@ def DownloadNextSub():
     global host
     global port
     global password
+    global slug_file_id_list
+    global fileID
+    global CurrentSubName
     if current_index < len(slug_file_id_list):
         element = slug_file_id_list[current_index]
         current_index += 1
         CurrentSubName.config(text=f"Current Sub: {element['slug']}")
-        Id.FileID = element['file_id']
+        fileID = element['file_id']
     else:
         messagebox.showinfo("Info", "End of list reached")
     DownloadSub()
