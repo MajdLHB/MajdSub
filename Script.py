@@ -257,20 +257,47 @@ def OpenFile(SeriesFolder, Series, Season, Episode):
         if not selected_dir and dirname_list:
             selected_dir.append(random.choice(dirname_list))
 
-
-        season_patterns = [
-            f'Season{Season}', f'SEASON 0{Season}', f'season 0{Season}', 
-            f'S0{Season}', f's0{Season}', f'S{Season}', f's{Season}',
-            f'Season.0{Season}', f'SEASON.0{Season}', f'Season.{Season}', 
-            f'SEASON.{Season}', f'Season-0{Season}', f'SEASON-0{Season}',
-            f'Season {Season}', f'SEASON {Season}', f'season {Season}',
-            f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}',
-            f'Season_{Season}', f'SEASON_{Season}', f'season_{Season}',
-            f'Season[0{Season}]', f'SEASON[0{Season}]', f'season[0{Season}]',
-            f'Season 0{Season}', f'SEASON 0{Season}', f'season 0{Season}',
-            f'Season-0{Season}', f'SEASON-0{Season}', f'season-0{Season}'
+        Season = str(Season)
+        if len(Season) == 1:
+            season_patterns = [
+                f'Season0{Season}', f'SEASON 0{Season}', f'season 0{Season}', 
+                f'S0{Season}', f's0{Season}', f'S0{Season}', f's0{Season}',
+                f'Season.0{Season}', f'SEASON.0{Season}', f'Season.0{Season}', 
+                f'SEASON.0{Season}', f'Season-0{Season}', f'SEASON-0{Season}',
+                f'Season 0{Season}', f'SEASON 0{Season}', f'season 0{Season}',
+                f'Season-0{Season}', f'SEASON-0{Season}', f'season-0{Season}',
+                f'Season_0{Season}', f'SEASON_0{Season}', f'season_0{Season}',
+                f'Season[0{Season}]', f'SEASON[0{Season}]', f'season[0{Season}]',
+                f'Season 0{Season}', f'SEASON 0{Season}', f'season 0{Season}',
+                f'Season-0{Season}', f'SEASON-0{Season}', f'season-0{Season}'
             ]
-            
+        if len(Season) == 2 and Season[0] == '0':
+            season_patterns = [
+                f'Season{Season}', f'SEASON {Season}', f'season {Season}', 
+                f'S{Season}', f's{Season}', f'S{Season}', f's{Season}',
+                f'Season.{Season}', f'SEASON.{Season}', f'Season.{Season}', 
+                f'SEASON.{Season}', f'Season-{Season}', f'SEASON-{Season}',
+                f'Season {Season}', f'SEASON {Season}', f'season {Season}',
+                f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}',
+                f'Season_{Season}', f'SEASON_{Season}', f'season_{Season}',
+                f'Season[{Season}]', f'SEASON[{Season}]', f'season[{Season}]',
+                f'Season {Season}', f'SEASON {Season}', f'season {Season}',
+                f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}'
+            ]
+        if len(Season) == 2 and Season[0] != '0':
+            season_patterns = [
+                f'Season{Season}', f'SEASON {Season}', f'season {Season}', 
+                f'S{Season}', f's{Season}', f'S{Season}', f's{Season}',
+                f'Season.{Season}', f'SEASON.{Season}', f'Season.{Season}', 
+                f'SEASON.{Season}', f'Season-{Season}', f'SEASON-{Season}',
+                f'Season {Season}', f'SEASON {Season}', f'season {Season}',
+                f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}',
+                f'Season_{Season}', f'SEASON_{Season}', f'season_{Season}',
+                f'Season[{Season}]', f'SEASON[{Season}]', f'season[{Season}]',
+                f'Season {Season}', f'SEASON {Season}', f'season {Season}',
+                f'Season-{Season}', f'SEASON-{Season}', f'season-{Season}'
+            ]
+        Season = int(Season)
         SeasonFolder = []
 
         for season_pattern in season_patterns:
@@ -287,13 +314,29 @@ def OpenFile(SeriesFolder, Series, Season, Episode):
                                     seasonDir = os.path.join(root, dir)
                                     SeasonFolder.append(seasonDir)
                                     break
-
-        episode_patterns = [
-            f'EPISODE 0{Episode}', f'episode 0{Episode}', 
-            f'E0{Episode}', f'e0{Episode}', 
-            f'Episode.0{Episode}', f'EPISODE.0{Episode}',
-            f'Episode-0{Episode}', f'EPISODE-0{Episode}'
+        Episode = str(Episode)
+        if len(Episode) == 1:
+            episode_patterns = [
+                f'EPISODE 0{Episode}', f'episode 0{Episode}', 
+                f'E0{Episode}', f'e0{Episode}', 
+                f'Episode.{Episode}', f'EPISODE.{Episode}',
+                f'Episode-0{Episode}', f'EPISODE-0{Episode}'
             ]
+        if len(Episode) == 2 and Episode[0] == '0':
+            episode_patterns = [
+                f'EPISODE {Episode}', f'episode {Episode}', 
+                f'E{Episode}', f'e{Episode}', 
+                f'Episode.{Episode}', f'EPISODE.{Episode}',
+                f'Episode-{Episode}', f'EPISODE-{Episode}'
+                ]
+        if len(Episode) == 2 and Episode[0] != '0':
+            episode_patterns = [
+                f'EPISODE {Episode}', f'episode {Episode}', 
+                f'E{Episode}', f'e{Episode}', 
+                f'Episode.{Episode}', f'EPISODE.{Episode}',
+                f'Episode-{Episode}', f'EPISODE-{Episode}'
+                ]
+        Episode = int(Episode)
         
         episodePath = None
         matchedepisodes = []
