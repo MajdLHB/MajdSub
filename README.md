@@ -1,6 +1,3 @@
-
----
-
 # **MajdSub V1.0**
 
 MajdSub V1.0 is a Python script that integrates the OpenSubtitle and Maze-TV APIs to fetch subtitles in any language, encode them in UTF-8, and manage episode counts. It also controls VLC for seamless fullscreen playback with subtitles. This tool is ideal for those who want an easy way to manage subtitles and watch episodes directly in VLC.
@@ -35,27 +32,17 @@ Watch the [video tutorial](https://youtu.be/WKzk7VpAuEI).
 
 ## **Installation**
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/MajdLHB/MajdSub.git
-   cd MajdSub
-   ```
+1. **Install the source code (.zip)**:
+   - Extract the zip file.
+   - Open script.py with the python application.
 
-2. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set Up VLC HTTP Interface**:
+2. **Set Up VLC HTTP Interface**:
    - Open VLC media player.
    - Go to `Tools > Preferences`.
    - Under `Show settings`, select `All`.
    - Navigate to `Interface > Main interfaces > Lua`.
    - Set the password and ensure the HTTP interface is enabled.
    - Update the port and password in the script accordingly.
-
-4. **Update Configuration**:
-   - Replace placeholder paths, API keys, and other configurations in the script with your own.
 
 ## **Directory Structure**
 
